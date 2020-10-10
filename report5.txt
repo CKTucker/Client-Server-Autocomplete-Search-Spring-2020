@@ -1,0 +1,36 @@
+Chris Tucker
+5/2/2020
+
+I actually thought this one would be a lot more simple than it was, especially being given examples of working client and server classes. There ended up being a bunch of small details however that made things more difficult than I expected
+
+=====Implementation=====
+The implementation of this is fairly basic, and is modeled pretty much verbadum off of the Hello_Server&Client classes provided. The Server initializes its socket and awaits a client connection. Once they are connected, the server reads the command from the client giving it information on the search query, the file to search in, and the number of results to send back. 
+
+The code to perform the search itself is very similar to the code in the main method of Autocomplete. Finally the server prints the found terms to its output stream, followed by "END" which lets the client know it is finished sending data. After that, the Client sends a "QUIT" signal to the server and shuts itself down. The server meanwhile, is able to handle more clients.
+
+The Server only takes in the port as a command line argument, but the client takes in a port, search query, file, and the number of results to output. The last parameter is optional and defaults to 8. The arguments are checked to make sure there are enough and that the port number is greater than 1023.
+
+=====Problems Encountered=====
+Most of my issues supprisingly didn't come from the server parts themselves, in fact I found getting connections setup was quite easy after looking at the "Hello_Server&Client" classes. The issues I kept running into had to do with the interactions between the Scanner and PrintWriter to actually send and recieve the messages. 
+
+For example, one big issue I encountered had to do with how "in.hasNext()" was handled, particularly on the client side. The plan was that the server would write each of the found terms to "out" then the Client would basically setup a loop "while(in.hasNext())" and use that to print out the terms. I got that to print the terms, but the client would never hit the code beyond the loop. I tried putting debug messages inside the loop, but those were never hit after the terms finished printing. 
+
+That told me that the program was getting hung up on the "in.hasNext()" line, there shouldn't have been anything for the scanner to read, so I would expect it to return false at that point, but it seems to work differently than I thought. I solved this problem by having the server send an "END" after it sends of the terms, and the client will break out of the loop when it recieves this message.
+
+I ran into some other smaller issues related to things like calling "out.flush()", I asuumed this only needed to be called after your finished sending messages, but it seems you need to call it after every line. 
+
+=====Extra=====
+I noticed what you said in a comment on "Hello_Server" about how you can't reuse a port without closing out of the console, even if you use Ctrl+C to terminate the program. I looked theough the code for Hello.Server and I think that the reason for that was because serverSocket.close() is unreachable in the init() method. It made me wonder how you could implement a proper server shutdown, as because the server is listening for clients, it cant really listen for input at the same time. 
+
+With a bit of research I found you can capture the SIGINT sent to the program by Ctrl+C with a shutdownHook in Java. It actually ended up being pretty easy to implement, I just made a nested class extending Thread, and put the shutdown code in the run() method. Then in the main() method the Thread is created and added to the shutdownHook. In hindsight, I probably could have used an ananymous class if I added it to the init() method rather than in main(), but I already have it working so I don't really feel like changing it. 
+
+Essentially when Ctrl+C is pressed, the code in run() is executed, which properly closes the serverSocket. Using Ctrl+Z in Lunux however sends a different signal which the program cannot capture, and this code will not run. This should make it so you are able to close the server with Ctrl+C and then reopen it on the same port without an error. 
+
+=====References===== 
+Most issues for this project were solved through trial and error and the debugger in IntelliJ. As well, most of the Socket code and such were in the Hello_Server&Client classes, so I didn't need to look much up.
+
+Not super useful buut let me know that in.hasNext() doesn't work the way I thought it does.
+https://stackoverflow.com/questions/29133134/java-util-scanner-hangs-on-hasnext
+
+How you can capture the SIGINT in Java
+https://stackoverflow.com/questions/2541475/capture-sigint-in-java

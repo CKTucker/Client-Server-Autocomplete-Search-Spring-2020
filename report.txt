@@ -1,0 +1,96 @@
+Chris Tucker
+3/31/2020
+
+Overall, while this project was a lot more involved than our previous HW 
+assignment, I found it took a lot less effort due to my familiarty in 
+Java vs that of C. The main thing I needed to look into was the stuff 
+about about the Comparator and Comparable interfaces, which I think we 
+may have touched on in data structures but it had been a while since I 
+used them. I guess I will go class by class into how I approached 
+implementing everything.
+
+====Term====
+This class was probably the most straightforward after I started learning 
+about those interfaces. The only sort of problem I had actually were that 
+most guides I was finding implemented the comparators using lambda 
+methods or ananamous classes rather than the static inner class used in 
+the template. I considered modifying things to use the lambda classes but 
+I wasn't sure if you were using Java 8+, and I figured that if they were 
+already in the template, you wanted us to use them, so I did.
+
+Other than that, this class went smoothly. I think I had an issue in my first test where the PrefixOrder would give an error is the prefix length was longer than the string length, but that was fixed easily with Math.min().
+
+====BinarySearchDelux====
+This one took a bit more thinking about, but the hint pdf you put up 
+really helped a lot in coming up with a working solution. My only issue 
+with it is that I'm not really sure the algorithm is as efficient as it 
+could be. I'll use firstIndexOf() as an example. The way the algorithm 
+works is pretty much exactly like a normal binary search, you find the 
+midpoint between high and low, compare it to the key, and adjust high or 
+low accordingly for the next itteration. The only difference being when 
+you find a match for the key, you store that index as the current first, 
+and set (in this case high) to the mid value and continue. 
+
+My issue is that I feel like there may be something better to do once 
+you first hit the key your searcching for. In mine, you will continue 
+binary search as normal, but if say, the first value you hit was the 
+first, than all of those comparisons are a waste of time. I'm debating 
+if it would be better in general if, once you find the key, you simply 
+itterate forward or backwards through the array to find the first or 
+last index. 
+
+If we call the number of the key in the array k, than the time 
+complexity would probably be something like O(lg(n)/(x*k) + k), where x 
+is something I'm not really sure how to calculate, however if you assume 
+k will generally be small, I think this will probably be faster than 
+what I have above. In the worst case however, where k=n, the time 
+complexity will be something like n/2, which is a lot worse than the 
+required 1+lg(n). I left it as above, but I do wonder which would be 
+faster for an normal dataset. 
+
+====Autocomplete====
+This one where I really only had an issue with how much you wanted us to 
+create our own implementations of, and how much we could use built-in 
+methods. For example, my constructor is only 2 lines of actual code 
+long. I use Arrays.copyOf() do make a deffensive copy of the Terms, 
+normally you would have to do more of a deep copy, but as Term is 
+immutable, this is all that sould be required for it to be a defensive 
+copy. 
+
+Second is the sort, the doc mentioned it had to sort in nlg(n) in the 
+worst case, but I wasn't sure if you wanted us to implement an algorithm 
+or if I was fine to just use Arrays.sort(). After looking into what 
+algorithms are most effective for strings (more on that later) I was 
+ready to implement a merge sort algorithm, but when I was that 
+Arrays.sort() uses merge sort, and already works with comparators, I 
+decided to go with that. 
+
+As for the other methods, there implementations were fairly 
+straightforward, especially when I looked at how the demo main methods 
+were writen in the previous examples. I can't really comment on and 
+major diffculty in implementing them. 
+
+====Other stuff====
+I will say I am glad to have learned more about the Comparator and the 
+Comparable interfaces, they feel like they could be very powerful and 
+useful, basically letting you write a sort or a search once and apply it 
+with any sort of unique ordering of elements. It is something I 
+deffinatly want to continue trying to use.
+
+One interesting thing I found when looking through sorting algorithms 
+that are effective for strings is a data structure called a Trie 
+https://en.wikipedia.org/wiki/Trie.
+Essentially it is a form of search tree specialized to work with things 
+like dictionaries, where all nodes share a common prefix, and you build 
+up a given key as you walk down the tree. Weights can also be attached 
+to the leaf nodes. The cool thing about it is it essentially lets you 
+radex sort your collection of strigs in linear time. Searches can also 
+be done in O(m) time, where m is the max string length. After learning 
+about this, I kind of wanted to redo all my code to use trie's, but as I 
+needed to keep to the template on this one, I figure it's something I 
+may do on my own at some point.
+
+====References====
+https://www.geeksforgeeks.org/comparator-interface-java/
+https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Arrays.html
+https://www.informit.com/articles/article.aspx?p=2180073&seqNum=5
